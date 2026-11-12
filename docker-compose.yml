@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ingestion-postgres
+    environment:
+      POSTGRES_USER: synerise_user
+      POSTGRES_PASSWORD: secret_password
+      POSTGRES_DB: events_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synerise_user -d events_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

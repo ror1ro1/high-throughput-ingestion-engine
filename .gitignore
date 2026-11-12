@@ -1,0 +1,22 @@
+# Rust build artifacts (potrafi ważyć kilkaset MB)
+rust-service/target/
+**/target/
+
+# Kotlin / Gradle build artifacts
+kotlin-service/.gradle/
+kotlin-service/build/
+**/.gradle/
+**/build/
+
+# Python cache & environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE & OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
