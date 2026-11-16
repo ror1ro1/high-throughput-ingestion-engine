@@ -1,4 +1,27 @@
+FULL INSTRUCTION HOW TO USE ON THE BOTTOM PAGE
 markdown
+## Prerequisites
+* [Docker](https://docker.com)
+* [Docker Compose](https://docker.com)
+
+## How to Run
+1. Clone the repository:
+   ```bash
+   git clone https://github.com
+   cd twoja-nazwa-repozytorium
+   ```
+
+2. Build and start the application along with the PostgreSQL database:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. Verify that the service is running by checking the stats endpoint:
+   ```bash
+   curl http://localhost:8080/stats
+   ```
+
+   
 # High-Throughput Event Ingestion Engine (Kotlin vs Rust)
 
 A comparative backend engineering project evaluating two modern systems/backend stacks—**Kotlin (JVM)** and **Rust**—handling concurrent HTTP transaction event streams, in-memory buffering with backpressure, and micro-batched persistence into **PostgreSQL**.
@@ -86,3 +109,101 @@ cargo run --release
 pip install httpx faker
 python load_tester.py
 ```
+
+======================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+
+===========================================================================
+FULL INSTRUCTION OF USE — HIGH-THROUGHPUT INGESTION ENGINE (KOTLIN vs RUST)
+===========================================================================
+
+1) INSTALL TOOLS VIA POWERSHELL (ADMINISTRATOR MODE)
+---------------------------------------------------------------------------
+winget install --id Git.Git -e --source winget
+winget install -e --id EclipseAdoptium.Temurin.21.JDK
+winget install -e --id Rustlang.Rustup
+winget install -e --id Python.Python.3.12
+winget install -e --id PostgreSQL.PostgreSQL.16
+
+IMPORTANT MANUAL STEPS AFTER WINGET:
+* Rust Linker: Download & install Visual Studio Build Tools with "Desktop development with C++" selected (provides link.exe).
+* Gradle: Download Gradle 8.14.7 (binary-only) from gradle.org/releases, extract to C:\Gradle, and add C:\Gradle\bin to System Environment Variables -> Path.
+* Windows Security: If Windows blocks Rust compilation (os error 4551), turn off "Smart App Control" in Windows Security.
+* Restart Terminal: Close PowerShell and open a fresh CMD window so Windows loads the updated Path.
+
+===========================================================================
+2) CLONE REPOSITORY (IN CMD)
+===========================================================================
+mkdir C:\Users\%USERNAME%\Projects
+cd C:\Users\%USERNAME%\Projects
+git clone https://github.com
+cd high-throughput-ingestion-engine
+
+===========================================================================
+3) PREPARE POSTGRESQL 16 DATABASE (SKIP IF ALREADY CREATED)
+===========================================================================
+1. Open PowerShell (as Administrator) and connect to PostgreSQL (enter the password set during installation):
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres
+
+2. In postgres=# console, paste and press Enter:
+ALTER USER postgres WITH PASSWORD 'secret_password';
+CREATE USER synerise_user WITH PASSWORD 'secret_password';
+CREATE DATABASE events_db OWNER synerise_user;
+
+3. Switch to the new database:
+\c events_db
+
+4. In events_db=# console, paste and press Enter:
+GRANT ALL PRIVILEGES ON DATABASE events_db TO synerise_user;
+
+CREATE TABLE IF NOT EXISTS transaction_events (
+    event_id VARCHAR(64) PRIMARY KEY,
+    event_timestamp TIMESTAMPTZ NOT NULL,
+    user_id VARCHAR(32) NOT NULL,
+    amount NUMERIC(12, 2) NOT NULL,
+    payment_method VARCHAR(64) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL,
+    ingested_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+GRANT ALL PRIVILEGES ON TABLE transaction_events TO synerise_user;
+CREATE INDEX IF NOT EXISTS idx_events_user_id ON transaction_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_events_status ON transaction_events(status);
+
+5. Exit SQL console:
+\q
+
+===========================================================================
+4) RUN & BENCHMARK VERSION 1: KOTLIN ENGINE
+===========================================================================
+1. Open fresh CMD #1 (keep it open while testing):
+cd C:\Users\%USERNAME%\Projects\high-throughput-ingestion-engine\kotlin-service
+gradle run
+
+2. Wait for "Uruchamianie Kotlin Ingestion Engine na porcie 8080...", then open fresh CMD #2:
+cd C:\Users\%USERNAME%\Projects\high-throughput-ingestion-engine
+py -m pip install httpx faker
+py load_tester.py
+
+3. Stop Kotlin before starting Rust:
+Click on CMD #1 -> press Ctrl + C -> type Y -> press Enter (frees port 8080).
+
+===========================================================================
+5) RUN & BENCHMARK VERSION 2: RUST ENGINE
+===========================================================================
+1. In CMD #1, build and start Rust:
+cd C:\Users\%USERNAME%\Projects\high-throughput-ingestion-engine\rust-service
+cargo run --release
+
+2. Wait for "Uruchamianie Rust Ingestion Engine (Axum + Tokio) na porcie 8080...", then in CMD #2 run:
+cd C:\Users\%USERNAME%\Projects\high-throughput-ingestion-engine
+py load_tester.py
+
+3. Stop Rust when finished:
+Click on CMD #1 -> press Ctrl + C.
+
+(Optional) Check live metrics in browser while any server is running:
+http://localhost:8080/stats
+
+
