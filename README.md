@@ -133,7 +133,7 @@ CREATE INDEX IF NOT EXISTS idx_events_status ON transaction_events(status);
 cd C:\Users\%USERNAME%\Projects\high-throughput-ingestion-engine\kotlin-service
 gradle run
 
-2. Open fresh #2CMD:
+2. Open fresh #2CMD(keep open):
 cd C:\Users\%USERNAME%\Projects\high-throughput-ingestion-engine
 py -m pip install httpx faker
 py load_tester.py
